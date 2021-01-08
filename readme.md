@@ -26,7 +26,7 @@ The project structure should look like this:
 ### Start Docker Container
 After you met als preparations you can start the Docker Container. Just simply run:
 ```bash
-docker docker-compose up
+docker-compose up
 ```
 
 
