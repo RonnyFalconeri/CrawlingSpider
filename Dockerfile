@@ -30,9 +30,6 @@ RUN mkdir -p apache-nutch-1.17/urls
 # copy seeds into container
 COPY nutch/seed.txt apache-nutch-1.17/urls/
 
-# copy index-writers into container to integrate solr
-COPY nutch/index-writers.xml apache-nutch-1.17/conf/
-
 
 # setup Apache SOLR
 
@@ -45,7 +42,8 @@ RUN tar -xvzf solr-8.5.1.tgz
 # create resources for the SOLR core
 RUN mkdir -p solr-8.5.1/server/solr/configsets/nutch/
 RUN cp -r solr-8.5.1/server/solr/configsets/_default/* solr-8.5.1/server/solr/configsets/nutch/
+RUN rm solr-8.5.1/server/solr/configsets/nutch/conf/managed-schema
 
 # copy schema.xml into solr conf directory
-COPY solr/schema.xml solr-8.5.1/server/solr/configsets/nutch/conf/
+COPY solr/schema.xml solr-8.5.1/server/solr/configsets/nutch/conf/schema.xml
 

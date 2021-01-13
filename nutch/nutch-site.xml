@@ -5,11 +5,7 @@
 
 <configuration>
 <property>
-   <name>http.agent.name</name>
-   <value>Apache Nutch Test Spider</value>
-</property>
-    <property>
-  <name>plugin.includes</name>
-  <value>protocol-http|urlfilter-regex|parse-(html|tika)|index-basic|indexer-csv|scoring-opic|urlnormalizer-(pass|regex|basic)</value>
+ <name>http.agent.name</name>
+ <value>My CrawlingSpider</value>
 </property>
 </configuration>
