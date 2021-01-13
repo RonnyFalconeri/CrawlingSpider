@@ -27,7 +27,7 @@ NutchTutorial - [Here](https://cwiki.apache.org/confluence/display/NUTCH/NutchTu
 
 #### Apache SOLR
 According to the _NutchTutorial_, you have to use _Solr 8.5.1_ with _Nutch 1.17_.
-Newer version are not guaranteed to work. Newer releases can be downloaded [here](https://www.apache.org/dyn/closer.cgi/lucene/solr/). If you want to download version 8.5.1, you have to download it from the [archive](https://archive.apache.org/dist/lucene/solr/). Remember: Download the binary - not the source code! Put the binary in the _/solr_ directory.
+Newer version are not guaranteed to work. However, the current version of this project is only compatible with v8.5.1. Newer releases can be downloaded [here](https://www.apache.org/dyn/closer.cgi/lucene/solr/). If you want to download version 8.5.1, you have to download it from the [archive](https://archive.apache.org/dist/lucene/solr/). Remember: Download the binary - not the source code! Put the binary in the _/solr_ directory.
 
 
 The project structure should look like this:
@@ -47,7 +47,7 @@ The project structure should look like this:
 ### Start Docker Container
 After you met als preparations you can setup the Docker Container. Build the Docker image with the Dockerfile:
 ```bash
-docker built -t crawling_spider .
+docker build -t crawling_spider .
 ```
 
 To start a container from the image run:
@@ -64,14 +64,14 @@ docker exec -it crawler /bin/bash
 ## Before you crawl
 Before you can start crawling with Nutch and use the Solr web UI, you have to start Solr and create a nutch core within Solr.
 
-Enter the Solr directory and run this command to start Solr:
+Enter the container root directory and run this command to start Solr:
 ```bash
-bin/solr start -force
+solr-8.5.1/bin/solr start -force
 ```
 
 Now create a nutch core:
 ```bash
-bin/solr create -c nutch -d solr-8.5.1/server/solr/configsets/nutch/conf/ -force
+solr-8.5.1/bin/solr create -c nutch -d solr-8.5.1/server/solr/configsets/nutch/conf/ -force
 ```
 
 You should now be able to open the Solr web UI in the browser. If the container runs on your local machine, open the site on port 8983 with <http://localhost:8983>.
@@ -80,6 +80,11 @@ You should now be able to open the Solr web UI in the browser. If the container 
 
 ## Start crawling!
 There are two ways to crawl with Nutch. On the one hand you can execute every single command manually step by step for more control over the process (recommended for beginners) and on the other hand you can run one single command using a crawl script to automate the crawling process. To execute the following commands, enter the apache-nutch directory. Read the official tutorial [here](https://cwiki.apache.org/confluence/display/NUTCH/NutchTutorial#NutchTutorial-UsingIndividualCommandsforWhole-WebCrawling) for more informations.
+
+First of all run:
+```bash
+export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
+```
 
 ### Step by Step
 The crawling process consists of the following steps:
@@ -155,12 +160,20 @@ You should now have enough links to process. Before you can use them with Solr, 
 bin/nutch invertlinks crawl/linkdb -dir crawl/segments
 ```
 
+Start indexing with Solr:
+```bash
+bin/nutch index crawl/crawldb/ -dir crawl/segments -linkdb crawl/linkdb/
+```
+
+
 ### Crawl script
-If you want to use the crawl script, use _bin/crawl_ instead of _bin/nutch_.
+If you want to use the crawl script, use _bin/crawl_ instead of _bin/nutch_. This could take a few minutes.
 
 Example:
 ```bash
-bin/crawl crawl/crawldb 3
+bin/crawl -i -s urls crawl 2
 ```
+
+This will automatically run all of the previous steps including the deduplication step.
 
 Read [here](https://cwiki.apache.org/confluence/display/NUTCH/NutchTutorial#NutchTutorial-Usingthecrawlscript) to learn more.
