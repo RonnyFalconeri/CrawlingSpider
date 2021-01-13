@@ -6,6 +6,9 @@ How does it work? You have to provide the Apache Nutch and Solr binary distribut
 Keep in mind that there are two versions of Apache Nutch available: _Nutch 1.X_ and _Nutch 2.X_. While version 1.X relies on Hadoop and is more suitable for production environments, version 2.X has more features and a different, more modern architecture. Both differentiate in execution and installation. Read [here](https://cwiki.apache.org/confluence/display/NUTCH/Home) for more informations about the difference between the two versions.
 
 
+Used versions: **Nutch 1.17** & 
+**Solr 8.5.1**
+
 ## Getting Started
 
 ### Preparations
@@ -35,7 +38,6 @@ The project structure should look like this:
     /CrawlingSpider
         /nutch
             apache-nutch-*-bin.tar.gz
-            index-writers.xml
             nutch-site.xml
             seed.txt
         /solr
@@ -43,6 +45,36 @@ The project structure should look like this:
             schema.xml
         Dockerfile
         ...
+
+### QUICK START
+If you wasted too much time and must satisfy your boss as soon as possible, stop reading and just run these commands to setup Nutch and Solr in a container and execute your first crawl:
+```bash
+# build docker image
+docker build -t crawling_spider .
+
+# run container from image
+docker run -d -it -p 8983:8983 --name crawler crawling_spider
+
+# access container
+docker exec -it crawler /bin/bash
+
+# start solr server
+solr-8.5.1/bin/solr start -force
+
+# create nutch core in solr
+solr-8.5.1/bin/solr create -c nutch -d solr-8.5.1/server/solr/configsets/nutch/conf/ -force
+
+# set JAVA_HOME variable and forget about it
+export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
+
+# enter nutch directory
+cd apache-nutch-1.17
+
+# start crawling with 2 iterations - it takes a few minutes
+# increase iterations to earn yourself a nice coffee break
+bin/crawl -i -s urls crawl 2
+```
+Execute query at <http://localhost:8983/solr/#/nutch/query> to print some results from the crawl.
 
 ### Start Docker Container
 After you met als preparations you can setup the Docker Container. Build the Docker image with the Dockerfile:
