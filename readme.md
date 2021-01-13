@@ -123,9 +123,45 @@ bin/nutch parse $s1
 
 Update results
 ```bash
-docker-compose up
+bin/nutch updatedb crawl/crawldb $s1
 ```
 
 
-## Crawling Lifecycle
-The crawler gets invoked by the bash commands in _commands.sh_. You may edit them to change the invoking behaviour.
+Congratulations! You have now crawled for the first time.
+If you want, crawl a second time. This can take a few minutes:
+```bash
+bin/nutch generate crawl/crawldb crawl/segments -topN 100
+s2=`ls -d crawl/segments/2* | tail -1`
+echo $s2
+
+bin/nutch fetch $s2
+bin/nutch parse $s2
+bin/nutch updatedb crawl/crawldb $s2
+```
+
+
+If you are absolutely crazy, crawl a third time:
+```bash
+bin/nutch generate crawl/crawldb crawl/segments -topN 100
+s3=`ls -d crawl/segments/2* | tail -1`
+echo $s3
+
+bin/nutch fetch $s3
+bin/nutch parse $s3
+bin/nutch updatedb crawl/crawldb $s3
+```
+
+You should now have enough links to process. Before you can use them with Solr, you have to invert the links first:
+```bash
+bin/nutch invertlinks crawl/linkdb -dir crawl/segments
+```
+
+### Crawl script
+If you want to use the crawl script, use _bin/crawl_ instead of _bin/nutch_.
+
+Example:
+```bash
+bin/crawl crawl/crawldb 3
+```
+
+Read [here](https://cwiki.apache.org/confluence/display/NUTCH/NutchTutorial#NutchTutorial-Usingthecrawlscript) to learn more.
