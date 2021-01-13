@@ -42,7 +42,6 @@ The project structure should look like this:
             solr-*.tgz
             schema.xml
         Dockerfile
-        docker-compose.yml
         ...
 
 ### Start Docker Container
