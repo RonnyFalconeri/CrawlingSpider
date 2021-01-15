@@ -19,7 +19,6 @@ Download the Apache Nutch binary distribution [here](https://www.apache.org/dyn/
 
 The following configuration files are already provided by default:
 
-    - index-writers.xml
     - nutch-site.xml
     - seed.txt
 
