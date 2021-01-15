@@ -76,38 +76,6 @@ bin/crawl -i -s urls crawl 2
 ```
 Execute query at <http://localhost:8983/solr/#/nutch/query> to print some results from the crawl.
 
-### Start Docker Container
-After you met als preparations you can setup the Docker Container. Build the Docker image with the Dockerfile:
-```bash
-docker build -t crawling_spider .
-```
-
-To start a container from the image run:
-```bash
-docker run -d -it -p 8983:8983 --name crawler crawling_spider
-```
-
-After that the container will run in detached mode (in the background). Now you have a running instance of Nutch and Solr. To access the container you have to run:
-```bash
-docker exec -it crawler /bin/bash
-```
-
-
-## Before you crawl
-Before you can start crawling with Nutch and use the Solr web UI, you have to start Solr and create a nutch core within Solr.
-
-Enter the container root directory and run this command to start Solr:
-```bash
-solr-8.5.1/bin/solr start -force
-```
-
-Now create a nutch core:
-```bash
-solr-8.5.1/bin/solr create -c nutch -d solr-8.5.1/server/solr/configsets/nutch/conf/ -force
-```
-
-You should now be able to open the Solr web UI in the browser. If the container runs on your local machine, open the site on port 8983 with <http://localhost:8983>.
-
 
 
 ## Start crawling!
@@ -209,3 +177,26 @@ bin/crawl -i -s urls crawl 2
 This will automatically run all of the previous steps including the deduplication step.
 
 Read [here](https://cwiki.apache.org/confluence/display/NUTCH/NutchTutorial#NutchTutorial-Usingthecrawlscript) to learn more.
+
+
+## Export URLs
+You can export the URLs from the crawl database with the dump command. The following command exports the urls into a folder named dump/ inside the crawl/ directory:
+```bash
+bin/nutch dump -segment crawl/segments -outputDir crawl/dump/
+```
+
+If you want to copy the dumped urls outside the container into a folder on your host machine, you can do that with the docker cp command.
+
+If you still are inside the container, simply exit the container with:
+```bash
+exit
+```
+
+Copy the dump folder into a crawldump/ folder in your current directory:
+```bash
+docker cp crawler:apache-nutch-1.17/crawl/dump ./crawldump
+```
+
+Inside the crawldump/ folder you will find multiple folders like a8/ 89/ and so on. They contain the html source code of a specific url. You will also find a .json file. Each .json file corresponds to an iteration of your crawl execution e.g. if you crawled with 3 iterations, there will be 3 .json files. They contain the urls which were found in the given iteration.
+
+You can use the dumped urls or its source code to process it with a scraper like selenium.
